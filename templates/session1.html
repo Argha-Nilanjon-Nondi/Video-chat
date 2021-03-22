@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.min.js"></script>
+
+
+	<title>A home</title>
+	<style type="text/css" media="all">
+		button {
+			color: red;
+			background-color: yellow;
+			font-size: 20px;
+		}
+		#testbox {
+			width: 800px;
+			padding: 10px;
+			font-size: 20px;
+			color: lightgreen;
+
+		}
+	</style>
+
+</head>
+<body>
+	<p>
+		My homeyhhh
+	</p>
+	<video id="player"  autoplay></video>
+		<video id="player2" autoplay></video>
+	<button id="capture">Capture</button>
+	<canvas id="canvas" width=320 height=240></canvas>
+
+	<script type="text/javascript" charset="utf-8">
+		alert("Worked");
+try {
+    var socket = io();
+    const constraints = {video: true};
+    const player = document.getElementById('player');
+    const player2 = document.getElementById('player2');
+    const canvas = document.getElementById('canvas');
+	const context = canvas.getContext('2d');
+	const captureButton = document.getElementById('capture');
+
+captureButton.addEventListener("click",function (){		
+	
+var constraints = { video: true };
+
+navigator.mediaDevices.getUserMedia(constraints).then(function(mediaStream) {
+
+    var mediaRecorder = new MediaRecorder(mediaStream);
+	mediaRecorder.onstart = function(e) {
+        this.chunks = [];
+    };
+    mediaRecorder.ondataavailable = function(e) {
+		this.chunks.push(e.data);
+	
+	
+    };
+    mediaRecorder.onstop = function(e) {
+		var blob = new Blob(this.chunks, { 'type' : 'video/mp4' });
+		player.src=URL.createObjectURL(blob);
+        socket.emit('join_al', blob);
+    };
+
+
+ var status=true;
+ setInterval(() => {
+	 if(status==true){
+		 mediaRecorder.start();
+		 status=false;
+	 }
+	 else{
+		 mediaRecorder.stop();
+		 status=true;
+	 }
+ },5000);
+
+ 
+
+});
+
+
+
+
+
+
+});
+
+// When the client receives a voice message it will play the sound
+socket.on('news', function(arrayBuffer) {
+	var blob = new Blob([arrayBuffer], { 'type' : 'video/mp4' });
+  
+	 player2.src = window.URL.createObjectURL(blob);
+    player2.play()
+
+    
+ 
+   
+});
+
+
+	
+
+}
+		catch(e) {
+			alert(e);
+		}
+
+	</script>
+
+</body>
+</html>
